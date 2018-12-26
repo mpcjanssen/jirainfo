@@ -55,8 +55,7 @@ class syntax_plugin_jirainfo extends DokuWiki_Syntax_Plugin
             list($state, $match) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER:
-                    list($state, $key) = $data;
-                    print_r($data);
+                    list($state, $key) = $data;                    
                     $renderer->doc .= sprintf('<a class="jirainfo" href="" data-key="%s">', $key);		
                     break;			
                 

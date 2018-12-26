@@ -10,6 +10,8 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
     function register(Doku_Event_Handler $controller) {
         $controller->register_hook('AJAX_CALL_UNKNOWN', 'BEFORE', $this,'_ajax_call');
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, '_hookjs');
+        $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, '_fillConf');
+
     }
     
     /**
@@ -52,10 +54,23 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
 
     public function _hookjs(Doku_Event $event, $param) 
     {
+      
         $event->data['script'][] = array(
                             'type'    => 'text/javascript',
                             'charset' => 'utf-8',
                             '_data'   => '',
                             'src'     => DOKU_BASE."lib/plugins/jirainfo/src/jquery.webui-popover.js");
+   
+    }
+
+    public function _fillConf()
+    {
+        global $JSINFO;
+
+        $JSINFO['jirainfo'] = [
+            'trigger'   => $this->getConf('popoverTrigger'),
+            'animation' => $this->getConf('popoverAnimation')
+        ];
+
     }
 }
