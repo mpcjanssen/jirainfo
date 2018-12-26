@@ -7,3 +7,5 @@
 $conf['apiUser'] = '';
 $conf['apiPass'] = '';
 $conf['apiUrl']  = '';
+$meta['popoverTrigger'] = 'hover';
+$meta['popoverAnimation'] = 'none';
