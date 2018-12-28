@@ -32,7 +32,7 @@ class syntax_plugin_jirainfo extends DokuWiki_Syntax_Plugin
 			foreach ($xml->attributes() as $key => $value) {
 				$attributes[$key] = (string) $value;
 			}
-			// проверяем корректность заполненных данных
+
             if ($this->check($attributes)) return array($state, $attributes['key']);            
           break;
           	 
@@ -42,6 +42,13 @@ class syntax_plugin_jirainfo extends DokuWiki_Syntax_Plugin
         return array();
     }
 
+    /**
+     * check - correct attributes
+     *
+     * @param  Array $attributes
+     *
+     * @return boolean
+     */
     public function check(array $attributes) 
     {
         return array_key_exists('key', $attributes);
@@ -56,7 +63,7 @@ class syntax_plugin_jirainfo extends DokuWiki_Syntax_Plugin
             switch ($state) {
                 case DOKU_LEXER_ENTER:
                     list($state, $key) = $data;                    
-                    $renderer->doc .= sprintf('<a class="jirainfo" href="" data-key="%s">', $key);		
+                    $renderer->doc .= sprintf('<a class="jirainfo" href="javascript:void(0);" data-key="%s">', $key);		
                     break;			
                 
                 case DOKU_LEXER_UNMATCHED:
