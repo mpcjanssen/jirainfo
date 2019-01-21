@@ -14,8 +14,7 @@ if(!defined('DOKU_INC')) die();
  * need to inherit from this class
  */
 class syntax_plugin_jirainfo extends DokuWiki_Syntax_Plugin 
-{
-   
+{   
     public function getType() {	return 'substition'; }
     public function getSort() { return 361; }
 	public function connectTo($mode) { $this->Lexer->addEntryPattern('<(?:ji|jirainfo).*?>(?=.*?</(?:ji|jirainfo)>)', $mode, 'plugin_jirainfo'); }
