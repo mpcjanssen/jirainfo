@@ -11,7 +11,6 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
         $controller->register_hook('AJAX_CALL_UNKNOWN', 'BEFORE', $this,'_ajax_call');
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, '_hookjs');
         $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, '_fillConf');
-
     }
     
     /**
@@ -32,7 +31,7 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
         //header('Content-Type: application/json');        
         //echo json_encode($info); 
         //echo $this->html();
-        print_r($this->html());
+        echo json_encode($this->html());        
     }
 
     public function execRequest($key)
@@ -62,7 +61,8 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
                 'status'  => [
                                 'name'  => $arr['fields']['status']['name'],
                                 'color' => $arr['fields']['status']['statusCategory']['colorName'],
-                              ], 
+                              ],
+                'issueUrl' => $this->getTaskUrl($taskInfo['key']),
                 'summary'   => $arr['fields']['summary'],
                 'priority' => [
                                 'name'    => $arr['fields']['priority']['name'],
@@ -74,7 +74,7 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
                               ],
                 'totalComments' => $arr['fields']['comment']['total']               
                 ];
-                      
+        /*              
         $html  = '<p class="summary">'. $taskInfo['summary'] .'</p>';
         $html .= sprintf('<div class="status"><span class="color-%s">%s</span></div>',
                           $taskInfo['status']['color'],
@@ -87,7 +87,9 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
                           $taskInfo['priority']['name']);
         $html .= ($taskInfo['totalComments']) ? '<div class="comment-circle"><span class="total_comments">'. $taskInfo['totalComments'] .'</span></div>' : '';
         $html .= '<a href="'. $this->getTaskUrl($taskInfo['key']) .'"class="key_link">'. $taskInfo['key'] .'</a>';       
-        return $html;
+        */
+        //return $html;
+        return $taskInfo;
     }
 
     public function getTaskUrl(String $key = null)
@@ -99,10 +101,10 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
     public function _hookjs(Doku_Event $event, $param) 
     {      
         $event->data['script'][] = array(
-                            'type'    => 'text/javascript',
-                            'charset' => 'utf-8',
-                            '_data'   => '',
-                            'src'     => DOKU_BASE."lib/plugins/jirainfo/src/jquery.webui-popover.js");
+                        'type'    => 'text/javascript',
+                        'charset' => 'utf-8',
+                        '_data'   => '',
+                        'src'     => DOKU_BASE."lib/plugins/jirainfo/src/popper.min.js");
     }
 
     public function _fillConf()
