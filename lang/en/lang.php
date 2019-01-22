@@ -10,4 +10,5 @@ $lang['js']['content_status'] = 'Status';
 $lang['js']['content_summary'] = 'Summary';
 $lang['js']['content_priority'] = 'Priority';
 $lang['js']['content_issuetype'] = 'Issuetype';
+$lang['taskNotFound'] = "Task <code>%s</code> not found!";
 

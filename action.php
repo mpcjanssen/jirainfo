@@ -28,10 +28,8 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
         //json library of DokuWiki
         //$json = new JSON();                             
         //set content type
-        //header('Content-Type: application/json');        
-        //echo json_encode($info); 
-        //echo $this->html();
-        echo json_encode($this->html());        
+        //header('Content-Type: application/json');                
+        echo json_encode($this->html());                
     }
 
     public function execRequest($key)
@@ -50,20 +48,22 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
      * @return html
      */
     public function html()    
-    {
-        $data = $this->execRequest(trim($_POST['key']));
-        $arr = json_decode($data, true);
+    {   
+        $task = trim($_POST['key']);
 
-        if (!$arr) return 'ЗАПРОС НЕ СУЩЕСТВУЕТ';
+        $data = $this->execRequest($task);
+        $arr = json_decode($data, true);
+        // If task not found or does not exist
+        if (!$arr) return ['errors' => sprintf($this->getlang('taskNotFound'), $task)];
 
         $taskInfo = [    
-                'key'      => $arr['key'],                 
+                'key'     => $arr['key'],                 
                 'status'  => [
                                 'name'  => $arr['fields']['status']['name'],
                                 'color' => $arr['fields']['status']['statusCategory']['colorName'],
                               ],
-                'issueUrl' => $this->getTaskUrl($taskInfo['key']),
-                'summary'   => $arr['fields']['summary'],
+                'issueUrl' => $this->getTaskUrl($task),
+                'summary'  => $arr['fields']['summary'],
                 'priority' => [
                                 'name'    => $arr['fields']['priority']['name'],
                                 'iconUrl' => $arr['fields']['priority']['iconUrl'],
@@ -73,22 +73,7 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
                                 'iconUrl' => $arr['fields']['issuetype']['iconUrl']
                               ],
                 'totalComments' => $arr['fields']['comment']['total']               
-                ];
-        /*              
-        $html  = '<p class="summary">'. $taskInfo['summary'] .'</p>';
-        $html .= sprintf('<div class="status"><span class="color-%s">%s</span></div>',
-                          $taskInfo['status']['color'],
-                          $taskInfo['status']['name']);
-        $html .= sprintf('<img src="%s" class="issuetype" title="%s">', 
-                          $taskInfo['issuetype']['iconUrl'],
-                          $taskInfo['issuetype']['name']);         
-        $html .= sprintf('<img src="%s" class="priority" title="%s">', 
-                          $taskInfo['priority']['iconUrl'],
-                          $taskInfo['priority']['name']);
-        $html .= ($taskInfo['totalComments']) ? '<div class="comment-circle"><span class="total_comments">'. $taskInfo['totalComments'] .'</span></div>' : '';
-        $html .= '<a href="'. $this->getTaskUrl($taskInfo['key']) .'"class="key_link">'. $taskInfo['key'] .'</a>';       
-        */
-        //return $html;
+                ];                
         return $taskInfo;
     }
 
