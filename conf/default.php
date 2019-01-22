@@ -6,8 +6,8 @@
 
 $conf['apiUser'] = '';
 $conf['apiPass'] = '';
-$conf['apiUrl']  = 'http://your-jira-url/jira/rest/api/latest/';
-$meta['popoverPlacement'] = 'right';
-$meta['popoverTrigger']   = 'hover';
-$meta['popoverAnimation'] = 'none';
+$conf['apiUrl']  = 'http://your-jira-url/rest/api/latest/';
+$conf['popoverPlacement'] = 'right';
+$conf['popoverTrigger']   = 'click';
+$conf['popoverAnimation'] = 'none';
 
