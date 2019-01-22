@@ -97,12 +97,13 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
         global $JSINFO;
 
         $JSINFO['jirainfo'] = [
+            'placement' => $this->getConf('popoverPlacement'),
             'trigger'   => $this->getConf('popoverTrigger'),
             'animation' => $this->getConf('popoverAnimation'),
             //'width'     => $this->getConf('popoverWidth'),
             //'height'    => $this->getConf('popoverHeigth'),
-            'offsetTop' => $this->getConf('popoverOffsetTop'),
-            'offsetLeft' => $this->getConf('popoverOffsetLeft'),
+            //'offsetTop' => $this->getConf('popoverOffsetTop'),
+            //'offsetLeft' => $this->getConf('popoverOffsetLeft'),
         ];
 
     }

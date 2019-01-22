@@ -1,8 +1,8 @@
 window.addEventListener("load", function() {
   var elem = document.querySelectorAll(".jirainfo"),
     conf = {
-      trigger: "click",
-      placement: "top"
+      trigger: JSINFO['jirainfo']['trigger'],    //"click",
+      placement: JSINFO['jirainfo']['placement'] //"top"
     },  
     i = 0, // counter of elements
     loadIcon = "<div class=\"icon-load\"></div>";                 
