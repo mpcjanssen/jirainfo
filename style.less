@@ -28,7 +28,6 @@ a.jirainfo:before {
   0%   { transform: rotate(0deg);   }
   100% { transform: rotate(360deg); }
 }  
-
 .pop {
   -webkit-transform: scale(0.8);
   -o-transform: scale(0.8);
@@ -54,7 +53,7 @@ a.jirainfo:before {
   -o-transition: 0.15s linear;
   transition: 0.15s linear;
   opacity: 0;
-  filter: alpha(opacity=0);
+  filter: alpha(opacity=0);  
 }
 
 .ji-popover { 
@@ -77,6 +76,9 @@ a.jirainfo:before {
     padding: 9px 14px;
     overflow: auto;  
     display: block;
+    .ji-popover-content-body {  
+      transition: opacity 0.3s linear; 
+      opacity: 0;
     .status {      
       text-transform: uppercase;
       margin-bottom: 10px;      
@@ -123,7 +125,8 @@ a.jirainfo:before {
       float: right;
       color: #3b73af;
     }    
-  } // end content     
+  } // end body
+} // end content     
   .ji-arrow {
     position: absolute;
     content: '';
