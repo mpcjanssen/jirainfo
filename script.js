@@ -2,7 +2,7 @@ window.addEventListener("load", function() {
   var elem = document.querySelectorAll(".jirainfo"),
     conf = {
       trigger: JSINFO['jirainfo']['trigger'] || "click",
-      placement: JSINFO['jirainfo']['placement'] || "top"
+      placement: "left"//JSINFO['jirainfo']['placement'] || "top"
     },  
     i = 0, // counter of elements
     loadIcon = '<div class="icon-load"></div>';                 
@@ -30,8 +30,8 @@ window.addEventListener("load", function() {
     // before hide other pop-elements
     this.hide();     
 
-    if (elem.getAttribute("data-target")) {            
-      this.id = elem.getAttribute("data-target");
+    if (this.checkPopCreated(elem)) {            
+      this.id = elem.getAttribute("data-target");      
     } else {
       this.id  = "jiPopover" + ++i;
       this.key = elem.getAttribute("data-key"); 
@@ -46,7 +46,7 @@ window.addEventListener("load", function() {
   jiPopover.prototype.create = function() {
       let pop = document.createElement("div");
 
-      pop.className = "ji-popover pop out";      
+      pop.className = "ji-popover pop pop-out";      
       pop.id = this.id;
       pop.appendChild(this.setArrowElement());
       pop.appendChild(this.setPopContent(loadIcon));      
@@ -58,31 +58,36 @@ window.addEventListener("load", function() {
    * @param  {HTMLElement} elem target element   
    */
   jiPopover.prototype.show = function(elem) {           
-    let pop = this.getPopElementByName();
-        obj = this;     
+    let pop = this.getPopElementByName(),
+        obj = this;         
+    
+    this.setArrowPosition(conf.placement);        
 
     this.popper = new Popper(elem, pop, {
       placement: conf.placement,
       modifiers: {
-        offset: { offset: "0, 10px"},
+        offset: { offset: "0, 10px" },
+        arrow: {
+          element: obj.getPopElementByName("arrow")          
+        },
         computeStyle: { gpuAcceleration: false }
-      },        
-      onCreate: function(data) {                                    
-        obj.setArrowPosition(data);
-        obj.getPopElementByName("body").style.opacity = 1; // pop-content-body
       },
-      onUpdate: function(data) {    
-        obj.setArrowPosition(data); 
-        obj.getPopElementByName("body").style.opacity = 1; // pop-content-body                 
+      onCreate: function(data) {
+        
+      },
+      onUpdate: function(data) {
+        obj.setArrowPosition(data);
+        obj.getPopElementByName("body").style.opacity = 1; // pop-content-body                         
       }
     });              
 
     pop.style.display = "block";
     setTimeout(function () {
-      pop.classList.remove("out");
-      pop.classList.add("in");
+      pop.classList.remove("pop-out");
+      pop.classList.add("pop-in");
     }, 50);
 
+    
     this.handlerHidePop();
   };  
   /**
@@ -90,14 +95,19 @@ window.addEventListener("load", function() {
    * @method
    */
   jiPopover.prototype.hide = function() {        
-    let pop = document.querySelector(".ji-popover.in");
+    let pop = document.querySelector(".ji-popover.pop-in");
     // if found open popover-element, close him
     if (pop) {
       setTimeout(function() { pop.style.display = "none"; }, 50);
-      pop.classList.remove("in");
-      pop.classList.add("out");
+      pop.classList.remove("pop-in");
+      pop.classList.add("pop-out");
     }            
   };
+
+  jiPopover.prototype.checkPopCreated = function(elem) {
+    return elem.hasAttribute("data-target");
+  };
+
   // Hide poppers by click or mouseover element
   jiPopover.prototype.handlerHidePop = function() {
     let obj = this;
@@ -115,7 +125,7 @@ window.addEventListener("load", function() {
       case 'hover':                      
         document.addEventListener("mouseout", function (event) {
             if (event.target.classList[0] != "jirainfo"
-              //|| el.classList[0] != "ji-popover-content"
+              // || el.classList[0] != "ji-popover-content"
               // || el.classList[0] != "ji-arrow"
               // || el.parentElement.classList[0] != "ji-popover-content"
               // || el.parentElement.parentElement.classList[0] != "ji-popover-content"
@@ -154,21 +164,17 @@ window.addEventListener("load", function() {
   /**
    * Set position arrow-element 
    * @method
-   * @param  {dataObject} data   
+   * @param  {dataObject} data object popover.js  
    */
   jiPopover.prototype.setArrowPosition = function(data) {            
-    let arrow = this.getPopElementByName("arrow");
-
-    if (conf.placement == 'left' || conf.placement == 'right') {
-      // add class position arrow-element
-      arrow.classList.remove("arrow-" + data.originalPlacement);
-      arrow.classList.add("arrow-" + data.placement);
-      // top position        
-      arrow.style.top = data.popper.height / 2 - 12 + "px";      
-    } else {
+    const arrow = this.getPopElementByName("arrow");    
+    // for update elements
+    if (data.placement) {
       arrow.classList.remove("arrow-" + data.originalPlacement);
       arrow.classList.add("arrow-" + data.placement);                
-      arrow.style.left = data.popper.width / 2 - 12 + "px";      
+    // for create elements
+    } else {
+      arrow.classList.add("arrow-" + conf.placement);           
     }
   };   
   /**
