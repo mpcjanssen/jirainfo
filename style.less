@@ -50,8 +50,8 @@ a.jirainfo:before {
     display: block;
     .ji-popover-content-body {  
       transition: opacity 0.3s linear; 
-      opacity: 0;
-    .status {      
+      opacity: 1;
+    .ji-status {      
       text-transform: uppercase;
       margin-bottom: 10px;      
       span {
@@ -66,32 +66,32 @@ a.jirainfo:before {
         &.color-medium-gray {background-color:#ccc;border-color:#ccc;color:#333}
       }
     }
-    p.summary { 
+    p.ji-summary { 
       margin-bottom: 5px;     
       color: #4a4a4a;
     }
-    img.priority,
-    img.issuetype {            
+    img.ji-priority,
+    img.ji-issuetype {            
       float: left;
       height: 18px;
       width: 18px;
       overflow: hidden;
       margin: 2px 4px 0 0;       
     }      
-    div.comment-circle {
+    div.ji-comment-circle {
       display: inline;      
       background-color: @popover-border-color;
       border: 1px solid @popover-border-color;
       border-radius: 50%;
       margin-right: 5px;    
     
-      span.total_comments {              
+      span.ji-total-comments {              
         margin: 5px;
         font-size: 12px;
         color: @color-text;        
       }
     }
-    a.key_link {
+    a.ji-key-link {
       margin: 3px 0 0 10px; 
       font-size: 12px;
       float: right;

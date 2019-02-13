@@ -9,5 +9,5 @@ $conf['apiPass'] = '';
 $conf['apiUrl']  = 'http://your-jira-url/rest/api/latest/';
 $conf['popoverPlacement'] = 'right';
 $conf['popoverTrigger']   = 'click';
-$conf['popoverAnimation'] = 'none';
+$conf['popoverAnimation'] = 'fade';
 
