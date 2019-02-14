@@ -1,5 +1,5 @@
 @bg-color:             #fff;
-@popover-border-color: #F1F3F5;
+@popup-border-color: #F1F3F5;
 @close-size:           16px;
 @color-text:           #172B4D;
 @close-color:          #000;
@@ -13,7 +13,7 @@ a.jirainfo:before {
   background-size: 42px;  
 }
 
-.ji-popover-content .icon-load {
+.ji-popup-content .icon-load {
   content: " ";
   display: block;
   width: 16px;
@@ -28,7 +28,7 @@ a.jirainfo:before {
   0%   { transform: rotate(0deg);   }
   100% { transform: rotate(360deg); }
 }  
-.ji-popover { 
+.ji-popup { 
   // position: absolute;
   // margin: 10px;
   min-width: 50px;
@@ -44,11 +44,11 @@ a.jirainfo:before {
   white-space: normal;
   z-index: 999;
   background-color: @bg-color;
-  .ji-popover-content {
+  .ji-popup-content {
     padding: 9px 14px;
     overflow: auto;  
     display: block;
-    .ji-popover-content-body {  
+    .ji-popup-content-body {  
       transition: opacity 0.3s linear; 
       opacity: 1;
     .ji-status {      
@@ -80,8 +80,8 @@ a.jirainfo:before {
     }      
     div.ji-comment-circle {
       display: inline;      
-      background-color: @popover-border-color;
-      border: 1px solid @popover-border-color;
+      background-color: @popup-border-color;
+      border: 1px solid @popup-border-color;
       border-radius: 50%;
       margin-right: 5px;    
     

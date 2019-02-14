@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", function() {
   
-  var elem = document.querySelectorAll(".jirainfo"),
-    i = 0, // counter of elements
+  var elem = document.querySelectorAll(".jirainfo"),        
+    //Counter new popup elements  
+    counter = (function () {
+      var i = 0; return function () { return ++i; }
+    }()),
     timerElem  = null, // timer for hoverByElem
     timerPopup = null; // timer for hoverByPopup    
 
@@ -10,7 +13,9 @@ document.addEventListener("DOMContentLoaded", function() {
     placement: JSINFO['jirainfo']['placement'] || "top",
     animation: JSINFO['jirainfo']['animation'] || "fade"
   };      
-
+  //
+  // ACTIONS
+  //
   var plugin_jirainfo = (function() {        
     var self  = {};
   
@@ -19,12 +24,13 @@ document.addEventListener("DOMContentLoaded", function() {
         (CONF.trigger === "hover") ? hoverByElem(elem[i]) : eventClick(elem[i]);      
       }    
     };
+
     self.open = function () {  
       if (self.isOpened(this)) return;
-      // before hide opened popup 
+      // to hide all opened popup
       self.hide();
 
-      var popup = new jiPopover(this);       
+      var popup = new jiPopup(this);       
       popup.create();
       popup.show(this);      
       // if pop-element is created then only show, without getData
@@ -40,17 +46,18 @@ document.addEventListener("DOMContentLoaded", function() {
       popup.classList.add(CONF.animation+"-out");  
     };    
     /**     
-     * @param  {String} this id popup-element
+     * Hide all opened popup elements
      */    
     self.hide = function () {             
-      let popups = document.querySelectorAll(".ji-popover."+ CONF.animation +"-in");
+      let popupItems = document.querySelectorAll(".ji-popup."+ CONF.animation +"-in");
       //doesn't not found
-      if (!popups) return;
+      if (!popupItems) return;
 
-      for(let i = 0; i < popups.length; i++) {
-        self.setDisplayNone(popups[i]);
+      for(let i = 0; i < popupItems.length; i++) {
+        self.setDisplayNone(popupItems[i]);
       }
     };    
+
     self.isOpened = function (elem) {            
       if (elem.hasAttribute("data-target")) {        
         return document.getElementById(elem.getAttribute("data-target")).classList.contains(CONF.animation+"-in");
@@ -79,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }
   };
-  
+
   /**
    * @function
    * Trigger Hover
@@ -94,8 +101,8 @@ document.addEventListener("DOMContentLoaded", function() {
     };    
     elem.onmouseout = function () {
       clearTimeout(timer);                  
-      if (plugin_jirainfo.isOpened(elem)) {             
-        timerPopup = setTimeout(bind(hoverByPopup, elem), 100); 
+      if (plugin_jirainfo.isOpened(elem)) {                     
+        timerPopup = setTimeout(hoverByPopup.call(elem), 100); 
       }
     };    
   };
@@ -105,19 +112,17 @@ document.addEventListener("DOMContentLoaded", function() {
    * Trigger Hover
    * Events by popup element   
    */
-  function hoverByPopup () {
-    var popup = document.getElementById(this.getAttribute("data-target")),        
-        timer = null;
-
-    timer = setTimeout(plugin_jirainfo.hide, 100);      
+  function hoverByPopup() {
+    var popup = document.getElementById(this.getAttribute("data-target")),
+      timer = setTimeout(plugin_jirainfo.hide, 100);   
 
     popup.onmouseover = function () {      
-      clearTimeout(timerPopup); // returns on a popup
-      clearTimeout(timerElem);  // out for refer element
+      clearTimeout(timerPopup); // on open popup
+      clearTimeout(timerElem);  // if return out for refer element
       clearTimeout(timer);      // 
-    };    
-    popup.onmouseout = function () {             
-      timerElem = setTimeout(plugin_jirainfo.hide, 100);            
+    };
+    popup.onmouseout = function () {
+      timerElem = setTimeout(plugin_jirainfo.hide, 100);
     };
   };
   
@@ -130,51 +135,50 @@ document.addEventListener("DOMContentLoaded", function() {
    */
   function bind(func, context) {
     return function() {
-      return func.apply(context);
+      return func.call(context);
     };
   };  
 
   /**
-   * @Class jiPopover
+   * @Class jiPopup
    * @constructor
    * @param  {} elem target element
   */
-  function jiPopover(elem) {            
-  // text
-    if (this.isPopCreated(elem)) {
+  function jiPopup(elem) {                 
+
+    if (this.isCreated(elem)) {
       this.id  = elem.getAttribute("data-target");      
-    } else {
-      this.id = "jiPopover" + ++i;                    
+    } else {                        
+      this.id = "jiPopup" + counter();
       elem.setAttribute("data-target", this.id);
     }
     this.key = elem.getAttribute("data-key");       
   }; 
   /**
-   * Create the popover-element with arrow and content
+   * Create the Popup-element with arrow and content
    */
-  jiPopover.prototype.create = function() {        
+  jiPopup.prototype.create = function() {        
     if (this.getPopElemByName()) return;
 
-      let pop = document.createElement("div");
-      pop.className = "ji-popover "+ CONF.animation +" "+ CONF.animation +"-out";      
-      pop.id = this.id;
-      pop.appendChild(this.setArrowElement());
-      pop.appendChild(this.setPopContent());      
-      document.body.appendChild(pop);      
-  };
+      const popup = document.createElement("div");
+      popup.className = "ji-popup "+ CONF.animation +" "+ CONF.animation +"-out";      
+      popup.id = this.id;
+      popup.appendChild(this.setArrowElement());
+      popup.appendChild(this.setPopContent());      
+      document.body.appendChild(popup);      
+  };  
   /**
-   * Show the popover-element
-   * @param  {HTMLElement} elem target element   
+   * Show the Popup-element
+   * @param  {HTMLElement} elem reference element   
    */
-  jiPopover.prototype.show = function(elem) {           
-
-    let pop  = this.getPopElemByName();             
+  jiPopup.prototype.show = function (elem) {
+    const popup = this.getPopElemByName();
     this.createPopperJS(elem);
 
-    pop.style.display = "block";
+    popup.style.display = "block";
     setTimeout(function () {
-      pop.classList.remove(CONF.animation+"-out");
-      pop.classList.add(CONF.animation+"-in");
+      popup.classList.remove(CONF.animation + "-out");
+      popup.classList.add(CONF.animation + "-in");
     }, 50);
   };
   
@@ -182,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function() {
    * Add controll position element by Popper.js   
    * @param  {HTMLElement} elem reference link   
    */
-  jiPopover.prototype.createPopperJS = function (elem) {
+  jiPopup.prototype.createPopperJS = function (elem) {
     let self = this;
 
     this.popper = new Popper(elem, this.getPopElemByName(), {
@@ -203,36 +207,37 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
   }; 
+
   /**
    * Check created popper by element later
    * @param  {HTMLElement} elem - reference element
    * @return {Boolean} 
    */
-  jiPopover.prototype.isPopCreated = function(elem) {
+  jiPopup.prototype.isCreated = function(elem) {
     return elem.hasAttribute("data-target");
   };
        
   /**
-   * Create the content in the popover-element
+   * Create the content in the Popup-element
    * @method
    * @param  {string} content - icon-load
    * @return {Element} 
    */
-  jiPopover.prototype.setPopContent = function(content = '') {
-    let popContent = document.createElement("div");    
+  jiPopup.prototype.setPopContent = function(content = '') {
+    const popContent = document.createElement("div");    
     
-    popContent.className = "ji-popover-content";
+    popContent.className = "ji-popup-content";
     popContent.innerHTML = content || '<div class="icon-load"></div>'; //by default load-icon
     return popContent;
   };
   /**
-   * Create arrow in the popover-element
+   * Create arrow in the Popup-element
    * @method
    * @param  {string} content icon-load
    * @return {Element} 
    */  
-  jiPopover.prototype.setArrowElement = function() {
-    let arrow = document.createElement("div");
+  jiPopup.prototype.setArrowElement = function() {
+    const arrow = document.createElement("div");
     arrow.className = "ji-arrow arrow-"+ CONF.placement;  
     return arrow;
   };  
@@ -241,16 +246,16 @@ document.addEventListener("DOMContentLoaded", function() {
    * @method
    * @param  {String} place placement arrow-element
    */
-  jiPopover.prototype.setArrowPlacement = function(place) {                
+  jiPopup.prototype.setArrowPlacement = function(place) {                
     this.getPopElemByName("arrow").className = "ji-arrow arrow-" + place;
   };   
   /**
-   * Returns elements popover by their a name 
+   * Returns elements Popup by their a name 
    * @method
-   * @param  {string} name arrow, content, body, and by default(null) popover
+   * @param  {string} name arrow, content, body, and by default(null) Popup
    * @return {Element}
    */
-  jiPopover.prototype.getPopElemByName = function(name = '') {
+  jiPopup.prototype.getPopElemByName = function(name = '') {
     switch (name) {
       case "arrow": 
         return document.getElementById(this.id).children[0];                    
@@ -272,8 +277,8 @@ document.addEventListener("DOMContentLoaded", function() {
   /**
    * Ajax request    
    */
-  jiPopover.prototype.getDataByKey = function() {
-    var self = this;
+  jiPopup.prototype.getDataByKey = function() {
+    let self = this;
     jQuery.post(
       DOKU_BASE + "lib/exe/ajax.php",
       {
@@ -285,14 +290,13 @@ document.addEventListener("DOMContentLoaded", function() {
     );
   };
 
-  jiPopover.prototype.fillPopBody = function(obj) {
+  jiPopup.prototype.fillPopBody = function(obj) {
     // task not found or does not exist     
     if (obj.errors) {
       this.updContent(obj.errors);
       return;
     }
-
-    var html = '<div class="ji-popover-content-body">';
+    let html = '<div class="ji-popup-content-body">';
     html +=
       '<p class="ji-summary">'+ obj.summary +"</p>" +
       '<div class="ji-status"><span class="color-'+ obj.status.color +'">' + obj.status.name +"</span></div>" +
@@ -305,7 +309,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     this.updContent(html);
   };
-  jiPopover.prototype.updContent = function(html) {
+
+  jiPopup.prototype.updContent = function(html) {
     this.getPopElemByName('content').innerHTML = html;    
     // initialization a method onUpdate in popper.js
     this.popper.scheduleUpdate();     
