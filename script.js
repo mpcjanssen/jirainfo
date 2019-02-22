@@ -11,8 +11,17 @@ document.addEventListener("DOMContentLoaded", function() {
   const CONF = {
     trigger:   JSINFO['jirainfo']['trigger']   || "click",
     placement: JSINFO['jirainfo']['placement'] || "top",
-    animation: JSINFO['jirainfo']['animation'] || "fade"
+    animation: JSINFO['jirainfo']['animation'] || "pop"
   };      
+
+  var  clickOutside = function() {
+    document.onclick = function(event) {        
+      if (event.target.className != "jirainfo") {
+        plugin_jirainfo.hide();
+        event.stopPropagation();      
+      }
+    };
+  };
   //
   // ACTIONS
   //
@@ -21,8 +30,10 @@ document.addEventListener("DOMContentLoaded", function() {
   
     self.init = function () {      
       for (let i = 0; i < elem.length; i++) {
-        (CONF.trigger === "hover") ? hoverByElem(elem[i]) : eventClick(elem[i]);      
+        (CONF.trigger === "hover") ? hoverByElem(elem[i]) : eventClick(elem[i]);
       }    
+      // only click
+      (CONF.trigger === "click") ? clickOutside() : '';
     };
 
     self.open = function () {  
@@ -76,14 +87,6 @@ document.addEventListener("DOMContentLoaded", function() {
   function eventClick(elem) {    
     elem.onclick = function() {
       plugin_jirainfo.open.call(elem);      
-    }
-  };
-  // Hide poppers by click or mouseover element
-  function hideByOutElem() {   
-    document.onclick = function(event) {
-      if (event.target.className != "jirainfo") {        
-        event.stopPropagation();
-      }
     }
   };
 
@@ -223,11 +226,11 @@ document.addEventListener("DOMContentLoaded", function() {
    * @param  {string} content - icon-load
    * @return {Element} 
    */
-  jiPopup.prototype.setPopContent = function(content = '') {
+  jiPopup.prototype.setPopContent = function(content) {
     const popContent = document.createElement("div");    
     
     popContent.className = "ji-popup-content";
-    popContent.innerHTML = content || '<div class="icon-load"></div>'; //by default load-icon
+    popContent.innerHTML = content || '<div class="icon-load"></div>';
     return popContent;
   };
   /**
@@ -255,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
    * @param  {string} name arrow, content, body, and by default(null) Popup
    * @return {Element}
    */
-  jiPopup.prototype.getPopElemByName = function(name = '') {
+  jiPopup.prototype.getPopElemByName = function(name) {
     switch (name) {
       case "arrow": 
         return document.getElementById(this.id).children[0];                    
