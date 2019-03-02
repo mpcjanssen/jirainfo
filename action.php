@@ -7,10 +7,12 @@
  */
 class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
 
+    protected $fields = ['status', 'priority', 'issuetype', 'comment']; // Default fields for viewing in popover    
+
     function register(Doku_Event_Handler $controller) {
         $controller->register_hook('AJAX_CALL_UNKNOWN', 'BEFORE', $this,'_ajax_call');
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, '_hookjs');
-        $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, '_fillConf');
+        $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'setConf');
     }
     
     /**
@@ -23,88 +25,123 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
         }
         //no other ajax call handlers needed
         $event->stopPropagation();
-        $event->preventDefault();
-    
-        //json library of DokuWiki
-        //$json = new JSON();                             
-        //set content type
-        //header('Content-Type: application/json');                
-        echo json_encode($this->html());                
+        $event->preventDefault();        
+        echo json_encode($this->fillDataTask());                
     }
 
-    public function execRequest($key)
+    /**
+     * request - get data about a task 
+     *
+     * @param string $key
+     *
+     * @return json
+     */
+    public function request(String $key)
     {
-        //$url = 'http://user:pass@url-api/rest/api/latest/issue/key';
-        $auth = '?os_username='. $this->getConf('apiUser'). '&os_password='. $this->getConf('apiPass');
-        $url = $this->getConf('apiUrl').'issue/'. $key . $auth;
-
+        $uri = parse_url($this->getConf('apiUrl'));       
+        $url = sprintf('%s://%s:%s@%sissue/%s?fields=summary,%s',
+            $uri['scheme'], 
+            $this->getConf('apiUser'), 
+            $this->getConf('apiPass'),
+            $uri['host'].$uri['path'],
+            $key,
+            implode(",", $this->getFieldsRequest())
+        );                 
+  
         $http = new DokuHTTPClient();
         return $http->get($url);        
     }
 
     /**
-     * html - parse result ajax-request
+     * getFieldsRequest - returned fields for request
      *
-     * @return html
+     * @return array
      */
-    public function html()    
-    {   
-        $task = trim($_POST['key']);
+    public function getFieldsRequest() {
+        $arrFields = explode(",", $this->getConf('taskHideField'));            
+        return array_diff($this->fields, $arrFields);                 
+    }
 
-        $data = $this->execRequest($task);
+    /**
+     * fillDataTask - to parse data about a task and returned in array
+     *
+     * @return Array
+     */
+    public function fillDataTask()    
+    {   
+        $res    = [];
+        $task   = trim($_POST['key']);
+        $fields = $this->getFieldsRequest(); 
+
+        $data = $this->request($task);
         $arr = json_decode($data, true);
         // If task not found or does not exist
         if (!$arr) return ['errors' => sprintf($this->getlang('taskNotFound'), $task)];
 
-        $taskInfo = [    
-                'key'     => $arr['key'],                 
-                'status'  => [
-                                'name'  => $arr['fields']['status']['name'],
-                                'color' => $arr['fields']['status']['statusCategory']['colorName'],
-                              ],
-                'issueUrl' => $this->getTaskUrl($task),
-                'summary'  => $arr['fields']['summary'],
-                'priority' => [
-                                'name'    => $arr['fields']['priority']['name'],
-                                'iconUrl' => $arr['fields']['priority']['iconUrl'],
-                              ],
-                'issuetype'=> [
-                                'name'    => $arr['fields']['issuetype']['name'],
-                                'iconUrl' => $arr['fields']['issuetype']['iconUrl']
-                              ],
-                'totalComments' => $arr['fields']['comment']['total']               
-                ];                
-        return $taskInfo;
+        $res = [
+            'key'      => $arr['key'],
+            'summary'  => $arr['fields']['summary'],
+            'issueUrl' => $this->getTaskLink($task),
+        ];
+
+        if (in_array('status', $fields)) {
+            $res['status'] = [
+                'name'  => $arr['fields']['status']['name'],
+                'color' => $arr['fields']['status']['statusCategory']['colorName']
+            ];
+        }
+        if (in_array('priority', $fields)) {
+            $res['priority'] = [
+                'name'    => $arr['fields']['priority']['name'],
+                'iconUrl' => $arr['fields']['priority']['iconUrl']
+            ];            
+        }
+        if (in_array('issuetype', $fields)) {
+            $res['issuetype'] = [
+                'name'    => $arr['fields']['issuetype']['name'],
+                'iconUrl' => $arr['fields']['issuetype']['iconUrl']
+            ];
+        }
+        if (in_array('comment', $fields)) {
+            $res['totalComments'] = $arr['fields']['comment']['total'];
+        }
+        return $res; 
     }
 
-    public function getTaskUrl(String $key = null)
+    /**
+     * getTaskLink
+     *
+     * @param  String $key task key
+     *
+     * @return String
+     */
+    public function getTaskLink (String $key = null)
     {
         $arrURL = parse_url($this->getConf('apiUrl'));
-        return $arrURL['scheme'] .'://'. $arrURL['host'] .'/browse/'. $key;
-        
-    }
-    public function _hookjs(Doku_Event $event, $param) 
-    {      
-        $event->data['script'][] = array(
-                        'type'    => 'text/javascript',
-                        'charset' => 'utf-8',
-                        '_data'   => '',
-                        'src'     => DOKU_BASE."lib/plugins/jirainfo/src/popper.min.js");
+        return $arrURL['scheme'] .'://'. $arrURL['host'] .'/browse/'. $key;                
     }
 
-    public function _fillConf()
+    public function _hookjs(Doku_Event $event) 
+    {
+        $event->data['script'][] = array(
+            'type'    => 'text/javascript',
+            'charset' => 'utf-8',
+            '_data'   => '',
+            'src'     => DOKU_BASE."lib/plugins/jirainfo/src/popper.min.js");
+    }
+
+    /**
+     * setConf - set config options in $JSINFO
+     * 
+     */
+    public function setConf()
     {
         global $JSINFO;
 
         $JSINFO['jirainfo'] = [
             'placement' => $this->getConf('popoverPlacement'),
             'trigger'   => $this->getConf('popoverTrigger'),
-            'animation' => $this->getConf('popoverAnimation'),
-            //'width'     => $this->getConf('popoverWidth'),
-            //'height'    => $this->getConf('popoverHeigth'),
-            //'offsetTop' => $this->getConf('popoverOffsetTop'),
-            //'offsetLeft' => $this->getConf('popoverOffsetLeft'),
+            'animation' => $this->getConf('popoverAnimation')
         ];
-
     }
 }

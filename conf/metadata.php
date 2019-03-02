@@ -10,3 +10,4 @@ $meta['apiUrl']  = array('string');
 $meta['popoverTrigger']   = array('multichoice', '_choices' => array('click', 'hover'));
 $meta['popoverPlacement'] = array('multichoice', '_choices' => array('top', 'right', 'bottom', 'left'));
 $meta['popoverAnimation'] = array('multichoice', '_choices' => array('none', 'pop', 'fade'));
+$meta['taskHideField']   = array('multicheckbox','_choices' => array('status','priority','issuetype','comment'));

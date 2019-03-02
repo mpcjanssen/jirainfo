@@ -6,6 +6,7 @@
  * @author     Vadim Balabin <vadikflint@gmail.com>
  */
  
-$lang['apiUser'] = "Login for jira service";
-$lang['apiPass'] = "Pass for jira service";
-$lang['apiUrl']  = "URL for jira service. <br>Example: <code>http://<b>your-jira-url</b>/rest/api/latest/</code>";
+$lang['apiUser'] = "Login for Jira API";
+$lang['apiPass'] = "Password for Jira API";
+$lang['apiUrl']  = "URL for Jira API";
+$lang['taskHideField'] = "Allow hide a fields in popover";

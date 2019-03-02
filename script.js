@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function() {
   };
   
   /**
-   * Add controll position element by Popper.js   
+   * Add control position element by Popper.js   
    * @param  {HTMLElement} elem reference link   
    */
   jiPopup.prototype.createPopperJS = function (elem) {
@@ -299,15 +299,24 @@ document.addEventListener("DOMContentLoaded", function() {
       this.updContent(obj.errors);
       return;
     }
+
     let html = '<div class="ji-popup-content-body">';
-    html +=
-      '<p class="ji-summary">'+ obj.summary +"</p>" +
-      '<div class="ji-status"><span class="color-'+ obj.status.color +'">' + obj.status.name +"</span></div>" +
-      '<img src="'+ obj.issuetype.iconUrl +'" class="ji-issuetype" title="'+ obj.issuetype.name +'">';
-  
-    html += obj.totalComments ? '<div class="ji-comment-circle"><span class="total-comments">'+ 
-            obj.totalComments + "</span></div>" : "";
-    html += '<a href="' + obj.issueUrl + '"class="ji-key-link">' + obj.key + "</a>";
+    //title(summary)
+    html += obj.summary ? '<p class="ji-summary">' + obj.summary + "</p>" : "";
+    //status
+    html += obj.status ? '<div class="ji-status"><span class="color-' + obj.status.color + '">'
+      + obj.status.name + "</span></div>" : "";
+    //issuetype
+    html += obj.issuetype ? '<img src="' + obj.issuetype.iconUrl + '" class="ji-issuetype" title="' + 
+      obj.issuetype.name + '">' : "";
+    //priority
+    html += obj.priority ? '<img src="' + obj.priority.iconUrl + '" class="ji-issuetype" title="' + 
+    obj.priority.name + '">' : "";
+    //comment
+    html += obj.totalComments ? '<div class="ji-comment-circle"><span class="total-comments">' +
+      obj.totalComments + "</span></div>" : "";
+    // url task
+    html += obj.issueUrl ? '<a href="' + obj.issueUrl + '"class="ji-key-link">' + obj.key + "</a>" : "";
     html += '</div>';
 
     this.updContent(html);
