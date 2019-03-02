@@ -26,7 +26,7 @@ class syntax_plugin_jirainfo extends DokuWiki_Syntax_Plugin
 			
           case DOKU_LEXER_ENTER :
             $xml = simplexml_load_string(str_replace('>', '/>', $match));
-			$tag = $xml->getName();
+            //$tag = $xml->getName();
 			
 			foreach ($xml->attributes() as $key => $value) {
 				$attributes[$key] = (string) $value;

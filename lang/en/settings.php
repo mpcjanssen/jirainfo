@@ -9,3 +9,4 @@
 $lang['apiUser'] = "Login for jira service";
 $lang['apiPass'] = "Pass for jira service";
 $lang['apiUrl']  = "URL for jira service. <br>Example: <code>http://<b>your-jira-url</b>/rest/api/latest/</code>";
+$lang['taskHideField'] = "Hide fields in popover";
