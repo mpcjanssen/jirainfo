@@ -30,9 +30,8 @@ class syntax_plugin_jirainfo extends DokuWiki_Syntax_Plugin
 			
 			foreach ($xml->attributes() as $key => $value) {
 				$attributes[$key] = (string) $value;
-			}
-
-            if ($this->check($attributes)) return array($state, $attributes['key']);            
+            }                        
+            if (array_key_exists('key', $attributes)) return array($state, $attributes['key']);            
           break;
           	 
           case DOKU_LEXER_UNMATCHED :  return array($state, $match);

@@ -2,9 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
   var elem = document.querySelectorAll(".jirainfo"),        
     //Counter new popup elements  
-    counter = (function () {
-      var i = 0; return function () { return ++i; }
-    }()),
+    counter = 0,
     timerElem  = null, // timer for hoverByElem
     timerPopup = null; // timer for hoverByPopup    
 
@@ -22,9 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     };
   };
-  //
-  // ACTIONS
-  //
+
   var plugin_jirainfo = (function() {        
     var self  = {};
   
@@ -152,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (this.isCreated(elem)) {
       this.id  = elem.getAttribute("data-target");      
     } else {                        
-      this.id = "jiPopup" + counter();
+      this.id = "jiPopup" + ++counter;
       elem.setAttribute("data-target", this.id);
     }
     this.key = elem.getAttribute("data-key");       
@@ -222,7 +218,7 @@ document.addEventListener("DOMContentLoaded", function() {
        
   /**
    * Create the content in the Popup-element
-   * @method
+   
    * @param  {string} content - icon-load
    * @return {Element} 
    */
@@ -235,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function() {
   };
   /**
    * Create arrow in the Popup-element
-   * @method
+   
    * @param  {string} content icon-load
    * @return {Element} 
    */  
@@ -246,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function() {
   };  
   /**
    * Set position arrow-element 
-   * @method
+   
    * @param  {String} place placement arrow-element
    */
   jiPopup.prototype.setArrowPlacement = function(place) {                
@@ -254,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function() {
   };   
   /**
    * Returns elements Popup by their a name 
-   * @method
+   
    * @param  {string} name arrow, content, body, and by default(null) Popup
    * @return {Element}
    */
@@ -280,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function() {
   /**
    * Ajax request    
    */
-  jiPopup.prototype.getDataByKey = function() {
+  jiPopup.prototype.getDataByKey = function () {
     let self = this;
     jQuery.post(
       DOKU_BASE + "lib/exe/ajax.php",
@@ -288,8 +284,7 @@ document.addEventListener("DOMContentLoaded", function() {
         call: "plugin_jirainfo",
         key: this.key
       },
-      function(data) { self.fillPopBody(JSON.parse(data)); }
-      //,'json'
+      function (data) { self.fillPopBody(JSON.parse(data)); }
     );
   };
 

@@ -9,5 +9,7 @@
 $lang['apiUser'] = "Логин для Jira API";
 $lang['apiPass'] = "Пароль для Jira API";
 $lang['apiUrl']  = "URL-ссылка для Jira API";
-$lang['apiUrl']  = "URL для Jira API";
-$lang['taskHideField'] = "Спрятать поля в popover";
+$lang['popoverTrigger'] = "Событие для открытия всплывающего окна";
+$lang['popoverPlacement'] = "Положение всплывающего окна";
+$lang['popoverAnimation'] = "Анимация при открытии";
+$lang['taskHideField'] = "Спрятать поля в всплывающем окне";
