@@ -36,20 +36,26 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
      *
      * @return json
      */
-    public function request(String $key)
-    {
-        $uri = parse_url($this->getConf('apiUrl'));       
-        $url = sprintf('%s://%s:%s@%sissue/%s?fields=summary,%s',
+    public function request(String $url)
+    {   
+        $http = new DokuHTTPClient();
+        return $http->get($url);        
+    }
+
+    public function getJiraApiUrl(String $key) {
+
+        $uri = parse_url($this->getConf('apiUrl')); 
+        //Jira API URL endpoint must include the trailing slash        
+        $path = (preg_match('/\w+\/$/', $uri['path'])) ? $uri['path'] : $uri['path'] . '/';      
+        
+        return sprintf('%s://%s:%s@%s/%s?fields=summary,%s',
             $uri['scheme'], 
             $this->getConf('apiUser'), 
             $this->getConf('apiPass'),
-            $uri['host'].$uri['path'],
+            $uri['host'].$path.'issue',
             $key,
             implode(",", $this->getFieldsRequest())
-        );                 
-  
-        $http = new DokuHTTPClient();
-        return $http->get($url);        
+        );        
     }
 
     /**
@@ -72,16 +78,17 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
         $res    = [];
         $task   = trim($_POST['key']);
         $fields = $this->getFieldsRequest(); 
+        $url    = $this->getJiraApiUrl($task);
+        $data   = $this->request($url);
+        $arr    = json_decode($data, true); 
 
-        $data = $this->request($task);
-        $arr = json_decode($data, true);
         // If task not found or does not exist
         if (!$arr) return ['errors' => sprintf($this->getlang('taskNotFound'), $task)];
 
         $res = [
             'key'      => $arr['key'],
             'summary'  => $arr['fields']['summary'],
-            'issueUrl' => $this->getTaskLink($task),
+            'issueUrl' => $this->getTaskUrl($task),
         ];
 
         if (in_array('status', $fields)) {
@@ -109,13 +116,13 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
     }
 
     /**
-     * getTaskLink
+     * getTaskUrl
      *
      * @param  String $key task key
      *
      * @return String
      */
-    public function getTaskLink (String $key = null)
+    public function getTaskUrl (String $key = null)
     {
         $arrURL = parse_url($this->getConf('apiUrl'));
         return $arrURL['scheme'] .'://'. $arrURL['host'] .'/browse/'. $key;                
