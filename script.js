@@ -22,12 +22,12 @@ document.addEventListener("DOMContentLoaded", function() {
   };
 
   var plugin_jirainfo = (function() {        
-    var self  = {};
-  
-    self.init = function () {      
+    var self = {};
+
+    self.init = function () {
       for (let i = 0; i < elem.length; i++) {
         (CONF.trigger === "hover") ? hoverByElem(elem[i]) : eventClick(elem[i]);
-      }    
+      }
       // only click
       (CONF.trigger === "click") ? clickOutside() : '';
     };

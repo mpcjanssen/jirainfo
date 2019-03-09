@@ -30,7 +30,7 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
     }
 
     /**
-     * request - get data about a task 
+     * request - get data a task 
      *
      * @param string $key
      *
@@ -38,8 +38,8 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
      */
     public function request(String $url)
     {   
-        $http = new DokuHTTPClient();
-        return $http->get($url);        
+        $http = new DokuHTTPClient();        
+        return $http->get($url);                
     }
 
     public function getJiraApiUrl(String $key) {
@@ -56,7 +56,7 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
             $key,
             implode(",", $this->getFieldsRequest())
         );        
-    }
+    } 
 
     /**
      * getFieldsRequest - returned fields for request
@@ -91,25 +91,25 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
             'issueUrl' => $this->getTaskUrl($task),
         ];
 
-        if (in_array('status', $fields)) {
+        if (in_array('status', $fields) && isset($arr['fields']['status'])) {
             $res['status'] = [
                 'name'  => $arr['fields']['status']['name'],
                 'color' => $arr['fields']['status']['statusCategory']['colorName']
             ];
         }
-        if (in_array('priority', $fields)) {
+        if (in_array('priority', $fields) && isset($arr['fields']['priority'])) {
             $res['priority'] = [
                 'name'    => $arr['fields']['priority']['name'],
                 'iconUrl' => $arr['fields']['priority']['iconUrl']
             ];            
         }
-        if (in_array('issuetype', $fields)) {
+        if (in_array('issuetype', $fields) && isset($arr['fields']['issuetype'])) {
             $res['issuetype'] = [
                 'name'    => $arr['fields']['issuetype']['name'],
                 'iconUrl' => $arr['fields']['issuetype']['iconUrl']
             ];
         }
-        if (in_array('comment', $fields)) {
+        if (in_array('comment', $fields) && isset($arr['fields']['comment'])) {
             $res['totalComments'] = $arr['fields']['comment']['total'];
         }
         return $res; 
@@ -151,4 +151,4 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
             'animation' => $this->getConf('popoverAnimation')
         ];
     }
-}
+ }
