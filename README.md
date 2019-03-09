@@ -1,5 +1,5 @@
-# jirainfo
-Display info about task from bug-tracking service Jira \
-Plugin for Dokuwiki
+# Jirainfo plugin for Dokuwiki
 
-**Version:** Beta
+Show Jira issue description in popover when hovering or click over an issue key.
+
+All documentation for this plugin can be found at http://www.dokuwiki.org/plugin:jirainfo.

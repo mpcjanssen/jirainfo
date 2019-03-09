@@ -2,6 +2,6 @@ base   jirainfo
 author Vadim Balabin
 email  vadikflint@gmail.com
 date   2018-12-21
-update 2018-12-21
-name   Jira info
-desc   Display info about task from bug-tracking service Jira
+update 2019-03-09
+name   Jira info plugin
+desc   Show Jira issue description in popover when hovering or click over an issue key.
