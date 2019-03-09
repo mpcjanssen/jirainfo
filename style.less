@@ -1,9 +1,9 @@
-@bg-color:             #fff;
+@bg-color:           #fff;
 @popup-border-color: #F1F3F5;
-@close-size:           16px;
-@color-text:           #172B4D;
-@close-color:          #000;
-
+@close-size:         16px;
+@color-text:         #172B4D;
+@close-color:        #000;
+// Icon element
 a.jirainfo:before {
   content: "";
   display: inline-block;
@@ -12,7 +12,7 @@ a.jirainfo:before {
   height: 16px;  
   background-size: 42px;  
 }
-
+// Icon load
 .ji-popup-content .icon-load {
   content: " ";
   display: block;
@@ -27,15 +27,12 @@ a.jirainfo:before {
 @keyframes dual-ring {
   0%   { transform: rotate(0deg);   }
   100% { transform: rotate(360deg); }
-}  
-.ji-popup { 
-  // position: absolute;
-  // margin: 10px;
+}
+
+.ji-popup {   
   min-width: 50px;
   min-height: 32px;
-  max-width: 300px;
-  // display: none;
-  // padding: 10px;
+  max-width: 300px;  
   border: 1px solid #ccc;
   border-radius: 5px;
   -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
@@ -47,7 +44,7 @@ a.jirainfo:before {
   .ji-popup-content {
     padding: 9px 14px;
     overflow: auto;  
-    display: block;
+    display: block;   
     .ji-popup-content-body {  
       transition: opacity 0.3s linear; 
       opacity: 1;
@@ -96,8 +93,8 @@ a.jirainfo:before {
       float: right;
       color: #3b73af;
     }    
-  } // end body
-} // end content     
+  } 
+} 
 // Arrow-element
   .ji-arrow {
     position: absolute;
