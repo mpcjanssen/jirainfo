@@ -28,7 +28,7 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
         $event->preventDefault();        
         echo json_encode($this->fillDataTask());                
     }
-
+    
     /**
      * request - get data a task 
      *
@@ -42,8 +42,8 @@ class action_plugin_jirainfo extends DokuWiki_Action_Plugin {
         return $http->get($url);                
     }
 
-    public function getJiraApiUrl(String $key) {
-
+    public function getJiraApiUrl(String $key) 
+    {
         $uri = parse_url($this->getConf('apiUrl')); 
         //Jira API URL endpoint must include the trailing slash        
         $path = (preg_match('/\w+\/$/', $uri['path'])) ? $uri['path'] : $uri['path'] . '/';      

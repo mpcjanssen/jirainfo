@@ -7,8 +7,8 @@ let plugin_jirainfo_popover = (function () {
   };   
 
   let self = {
-    id: "", // id popover-element - jiPopup1, jiPopup2, etc.
-    key: "" // task jira
+    id:  "", // id popover-element - jiPopup1, jiPopup2, etc.
+    key: ""  // task jira
   },
     timerOpen  = null, // timer for hover event
     timerClose = null; // timer for hover event   
@@ -208,7 +208,7 @@ let plugin_jirainfo_popover = (function () {
       return;
     }
 
-    let html = '<div class="ji-popup-content-body">';
+    let html = '';
     //title(summary)
     html += obj.summary ? '<p class="ji-summary">' + obj.summary + "</p>" : "";
     //status
@@ -225,7 +225,6 @@ let plugin_jirainfo_popover = (function () {
       obj.totalComments + "</span></div>" : "";
     // url task
     html += obj.issueUrl ? '<a href="' + obj.issueUrl + '"class="ji-key-link">' + obj.key + "</a>" : "";
-    html += '</div>';
 
     self.updContent(html);
   };
@@ -244,12 +243,11 @@ document.addEventListener("DOMContentLoaded", function() {
     plugin_jirainfo_popover.addEvent(el);
   });
   // For event by click
-  //(JSINFO['jirainfo']['trigger'] === "click") ? clickOutside () : "";
+  (JSINFO['jirainfo']['trigger'] === "click") ? clickOutside () : "";
 
   function clickOutside () {
     document.onclick = function(event) {        
-      if (!event.target.classList.contains("ji-popup")) {
-        console.info(event.target.className);
+      if (!event.target.classList.contains("jirainfo")) {        
         plugin_jirainfo_popover.hide();
         event.stopPropagation();      
       }
