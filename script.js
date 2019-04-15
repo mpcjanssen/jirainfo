@@ -1,141 +1,3 @@
-document.addEventListener("DOMContentLoaded", function() {
-  
-  let timerElem  = null, // timer for hoverByElem
-    timerPopup = null; // timer for hoverByPopup    
-
-  let clickOutside = function() {
-    document.onclick = function(event) {        
-      if (event.target.className != "jirainfo") {
-        plugin_jirainfo.hide();
-        event.stopPropagation();      
-      }
-    };
-  };  
-  
-  document.querySelectorAll(".jirainfo[data-key]").forEach(function (el) {
-    plugin_jirainfo_popover.addEvent(el);
-  });
-
-  let plugin_jirainfo = (function() {        
-    let self = {};
-
-    self.init = function () {      
-    /*  
-      for (let i = 0; i < elem.length; i++) {
-        (CONF.trigger === "hover") ? hoverByElem(elem[i]) : eventClick(elem[i]);
-      }
-      // only click
-      (CONF.trigger === "click") ? clickOutside() : '';
-    */  
-    };
-
-    self.open = function () {  
-      if (self.isOpened(this)) return;
-      // to hide all opened popup
-      self.hide();
-
-      var popup = new jiPopup(this);       
-      popup.create();
-      popup.show(this);      
-      // if pop-element is created then only show, without getData
-      if (popup.key) popup.getDataByKey();       
-    };
-    /**
-     * Hide popup-element
-     * @param  {HTMLElement} popup
-     */
-    self.setDisplayNone = function(popup) {
-      setTimeout(function() { popup.style.display = "none"; }, 50);      
-      popup.classList.remove(CONF.animation+"-in");
-      popup.classList.add(CONF.animation+"-out");  
-    };    
-    /**     
-     * Hide all opened popup elements
-     */    
-    self.hide = function () {             
-      let popupItems = document.querySelectorAll(".ji-popup."+ CONF.animation +"-in");
-      //doesn't not found
-      if (!popupItems) return;
-
-      for(let i = 0; i < popupItems.length; i++) {
-        self.setDisplayNone(popupItems[i]);
-      }
-    };    
-
-    self.isOpened = function (elem) {            
-      if (elem.hasAttribute("data-target")) {        
-        return document.getElementById(elem.getAttribute("data-target")).classList.contains(CONF.animation+"-in");
-      }
-    };    
-    return self;
-  })();  
-
-  //plugin_jirainfo.init(); 
- 
-  /**
-   * @function
-   * Trigger Click
-   * Events by popup element   
-   */
-  function eventClick(elem) {    
-    elem.onclick = function() {
-      plugin_jirainfo.open.call(elem);      
-    }
-  };
-
-  /**
-   * @function
-   * Trigger Hover
-   * Events by popup element   
-   */
-  function hoverByElem(elem) {
-    var timer = null;      
-    
-    elem.onmouseover = function() {
-      timer = setTimeout(bind(plugin_jirainfo.open, elem), 100);        
-      clearTimeout(timerElem)
-    };    
-    elem.onmouseout = function () {
-      clearTimeout(timer);                  
-      if (plugin_jirainfo.isOpened(elem)) {                     
-        timerPopup = setTimeout(hoverByPopup.call(elem), 100); 
-      }
-    };    
-  };
-  
-  /**
-   * @function
-   * Trigger Hover
-   * Events by popup element   
-   */
-  function hoverByPopup() {
-    var popup = document.getElementById(this.getAttribute("data-target")),
-      timer = setTimeout(plugin_jirainfo.hide, 100);   
-
-    popup.onmouseover = function () {      
-      clearTimeout(timerPopup); // on open popup
-      clearTimeout(timerElem);  // if return out for refer element
-      clearTimeout(timer);      // 
-    };
-    popup.onmouseout = function () {
-      timerElem = setTimeout(plugin_jirainfo.hide, 100);
-    };
-  };
-  
-  /**
-   * @function
-   * Bind function and this(context)
-   * @param  {Function} func 
-   * @param  {this} context
-   * @return {this}    
-   */
-  function bind(func, context) {
-    return function() {
-      return func.call(context);
-    };
-  };    
-});
-
 let plugin_jirainfo_popover = (function () {    
   
   const CONF = {
@@ -144,7 +6,12 @@ let plugin_jirainfo_popover = (function () {
     animation: JSINFO['jirainfo']['animation'] || "pop"
   };   
 
-  let self = {};
+  let self = {
+    id: "", // id popover-element - jiPopup1, jiPopup2, etc.
+    key: "" // task jira
+  },
+    timerOpen  = null, // timer for hover event
+    timerClose = null; // timer for hover event   
 
   self.addEvent = function (el) {            
     // add event    
@@ -152,10 +19,16 @@ let plugin_jirainfo_popover = (function () {
       el.onclick = function () {
         self.eventHandler(el);
       }
-    } else if (CONF.trigger === "hover") {
+    } else if (CONF.trigger === "hover") {      
       el.onmouseover = function () {
-        self.eventHandler(el);
-      }
+				clearTimeout(timerClose);
+				timerOpen = setTimeout(bind(self.eventHandler, el), 300);
+			};
+			el.onmouseout = function () {
+				clearTimeout(timerOpen);
+        timerClose = setTimeout(self.hide, 300);			                
+        self.popupHover();
+			};
     }
   };
   
@@ -166,12 +39,22 @@ let plugin_jirainfo_popover = (function () {
     self.show(el);
   };
 
+  self.popupHover = function () {
+    const popup = self.getPopupElem();
+    popup.onmouseover = function () {
+      clearTimeout(timerClose);
+    };
+    popup.onmouseout = function () {
+      timerClose = setTimeout(self.hide, 300);            
+    };
+  };
+
   self.getTargetVal = function (el) {
-    (!el.hasAttribute("data-target")) ? el.setAttribute("data-target", self.getTargetId()) : "";
+    (!el.hasAttribute("data-target")) ? el.setAttribute("data-target", self.getPopupId()) : "";
     return el.getAttribute("data-target");    
   };
 
-  self.getTargetId = (function () {
+  self.getPopupId = (function () {
 		let i = 0;
 		return function () { return "jiPopup" + ++i; }
 	}());
@@ -188,7 +71,7 @@ let plugin_jirainfo_popover = (function () {
     popup.appendChild(self.setArrowElement());
     popup.appendChild(self.setPopContent());
     document.body.appendChild(popup);
-
+    self.getDataByKey();
     return popup;
   };  
 /**
@@ -196,6 +79,9 @@ let plugin_jirainfo_popover = (function () {
  * @param  {HTMLElement} elem reference element   
  */
   self.show = function (el) {
+    if (el.classList.contains("ji-open")) return;
+    
+    self.hide();
     const popup = document.querySelector("#"+self.id) || self.createPopover();
     self.addPopperJS(el);
 
@@ -204,7 +90,18 @@ let plugin_jirainfo_popover = (function () {
       popup.classList.remove(CONF.animation + "-out");
       popup.classList.add(CONF.animation + "-in");
     }, 50);
+    el.classList.add("ji-open");
   };
+
+  self.hide = function () {		
+		const popup = document.querySelector(`.ji-popup.${CONF.animation}-in`),
+			elem = document.querySelector(`.jirainfo.ji-open`);
+		if (!popup) return;		
+		
+		popup.className = "ji-popup " + CONF.animation +" "+ CONF.animation+"-out";
+		elem.classList.remove("ji-open");
+		setTimeout( function () { popup.style.display = "none"; }, 50);					
+	};
 
   /**
    * Add control position element by Popper.js   
@@ -213,12 +110,12 @@ let plugin_jirainfo_popover = (function () {
   self.addPopperJS = function (elem) {
     let self = this;
 
-    self.popper = new Popper(elem, self.getPopElemByName(), {
+    self.popper = new Popper(elem, self.getPopupElem(), {
       placement: CONF.placement,
       modifiers: {
         offset: { offset: "0, 10px" },
         arrow: {
-          element: self.getPopElemByName("arrow")
+          element: self.getPopupElem("arrow")
         },
         computeStyle: { gpuAcceleration: false }
       },
@@ -227,14 +124,13 @@ let plugin_jirainfo_popover = (function () {
       },
       onUpdate: function (data) {
         self.setArrowPlacement(data.placement);
-        self.getPopElemByName("body").style.opacity = 1; // pop-content-body                         
+        self.getPopupElem("body").style.opacity = 1; // pop-content-body                         
       }
     });
   }; 
 
   /**
-   * Create the content in the Popup-element
-  
+   * Create the content in the Popup-element  
    * @param  {string} content - icon-load
    * @return {Element} 
    */
@@ -245,9 +141,9 @@ let plugin_jirainfo_popover = (function () {
     popContent.innerHTML = content || '<div class="icon-load"></div>';
     return popContent;
   };
-  /**
-   * Create arrow in the Popup-element
   
+  /**
+   * Create arrow in the Popup-element  
    * @param  {string} content icon-load
    * @return {Element} 
    */  
@@ -256,21 +152,21 @@ let plugin_jirainfo_popover = (function () {
     arrow.className = "ji-arrow arrow-"+ CONF.placement;  
     return arrow;
   };  
+
   /**
-   * Set position arrow-element 
-  
+   * Set position arrow-element   
    * @param  {String} place placement arrow-element
    */
   self.setArrowPlacement = function(place) {                
-    self.getPopElemByName("arrow").className = "ji-arrow arrow-" + place;
+    self.getPopupElem("arrow").className = "ji-arrow arrow-" + place;
   };   
-  /**
-   * Returns elements Popup by their a name 
   
+  /**
+   * Returns elements Popup by their a name   
    * @param  {string} name arrow, content, body, and by default(null) Popup
    * @return {Element}
    */
-  self.getPopElemByName = function (name) {
+  self.getPopupElem = function (name) {
     const popup = document.getElementById(self.id);
     
     switch (name) {
@@ -294,13 +190,12 @@ let plugin_jirainfo_popover = (function () {
   /**
    * Ajax request    
    */
-  self.getDataByKey = function () {
-    let self = this;
+  self.getDataByKey = function () {    
     jQuery.post(
       DOKU_BASE + "lib/exe/ajax.php",
       {
         call: "plugin_jirainfo",
-        key: this.key
+        key: self.key
       },
       function (data) { self.fillPopBody(JSON.parse(data)); }
     );
@@ -336,9 +231,28 @@ let plugin_jirainfo_popover = (function () {
   };
 
   self.updContent = function (html) {
-    self.getPopElemByName('content').innerHTML = html;    
+    self.getPopupElem('content').innerHTML = html;    
     // initialization a method onUpdate in popper.js
     self.popper.scheduleUpdate();     
   };
   return self;
 })();
+
+document.addEventListener("DOMContentLoaded", function() {
+  // Init
+  document.querySelectorAll(".jirainfo[data-key]").forEach(function (el) {
+    plugin_jirainfo_popover.addEvent(el);
+  });
+  // For event by click
+  //(JSINFO['jirainfo']['trigger'] === "click") ? clickOutside () : "";
+
+  function clickOutside () {
+    document.onclick = function(event) {        
+      if (!event.target.classList.contains("ji-popup")) {
+        console.info(event.target.className);
+        plugin_jirainfo_popover.hide();
+        event.stopPropagation();      
+      }
+    };
+  };    
+});
