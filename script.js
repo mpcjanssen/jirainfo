@@ -41,6 +41,9 @@ let plugin_jirainfo_popover = (function () {
 
   self.popupHover = function () {
     const popup = self.getPopupElem();
+    // check popup does is not exists 
+    if (!popup) return;    
+    
     popup.onmouseover = function () {
       clearTimeout(timerClose);
     };
